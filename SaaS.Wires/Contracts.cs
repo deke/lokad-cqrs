@@ -1,4 +1,4 @@
-﻿#region (c) 2010-2012 Lokad - CQRS- New BSD License 
+﻿#region (c) 2010-2012 Lokad - CQRS- New BSD License
 
 // Copyright (c) Lokad 2010-2012, http://www.lokad.com
 // This code is released as Open Source under the terms of the New BSD Licence
@@ -28,7 +28,7 @@ namespace SaaS.Wires
                 .Where(t => !t.IsAbstract)
                 .ToArray();
             return messages;
-            
+
         }
 
         public static EnvelopeStreamer CreateStreamer()
@@ -48,14 +48,16 @@ namespace SaaS.Wires
             protected override Formatter PrepareFormatter(Type type)
             {
                 var name = ContractEvil.GetContractReference(type);
-                return new Formatter(name, type, s => JsonSerializer.DeserializeFromStream(type, s), (o,s) =>
+                return new Formatter(name, type, s => JsonSerializer.DeserializeFromStream(type, s), (o, s) =>
                     {
-                        using(var writer = new StreamWriter(s))
-                        {
-                            writer.WriteLine();
-                            writer.WriteLine(JsvFormatter.Format(JsonSerializer.SerializeToString(o, type)));
-                        }
-                        
+
+                        var writer = new StreamWriter(s);
+
+                        writer.WriteLine();
+                        writer.WriteLine(JsvFormatter.Format(JsonSerializer.SerializeToString(o, type)));
+
+                        writer.Flush();
+
                     });
                 //var formatter = RuntimeTypeModel.Default.CreateFormatter(type);
                 //return new Formatter(name, formatter.Deserialize, (o, stream) => formatter.Serialize(stream, o));
